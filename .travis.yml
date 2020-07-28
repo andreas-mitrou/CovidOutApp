@@ -1,8 +1,9 @@
 language: csharp
-solution: CovidOutApp.sln
+dist: trusty
+mono: none
+dotnet: 3.1.300
 install:
-  - nuget restore CovidOutApp.sln
-  - nuget install NUnit.Console -Version 3.9.0 -OutputDirectory testrunner
+- dotnet restore
 script:
-  - msbuild /p:Configuration=Release CovidOutApp.sln
-  - mono ./testrunner/NUnit.ConsoleRunner.3.9.0/tools/nunit3-console.exe ./CovidOutApp.Tests/bin/Release/CovidOutApp.Tests.dll
+- dotnet build CovidOutApp.Web/CovidOutApp.Web.csproj
+- dotnet test CovidOutApp.Tests/CovidOutApp.Tests.csproj
