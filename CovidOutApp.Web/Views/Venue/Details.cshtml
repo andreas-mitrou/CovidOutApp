@@ -1,0 +1,40 @@
+@model CovidOutApp.Web.ViewModels.VenueViewModel
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+<div asp-validation-summary="All"></div>
+<div>
+     
+            @if (Model != null){
+      
+                 <h4>VenueViewModel</h4>
+                <hr />
+                <dl class="row">
+                
+                    <dt class = "col-sm-2">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+                    <dd class = "col-sm-10">
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+                </dl> 
+        }
+</div>
+<div>
+    
+      
+
+    <a asp-action="Index">Back to List</a>
+</div>
+</body>
+</html>

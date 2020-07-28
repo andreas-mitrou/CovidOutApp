@@ -1,0 +1,7 @@
+dotnet new mvc -au Individual -o CovidOutApp.Web
+cd CovidOutApp.Web
+dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
+dotnet aspnet-codegenerator identity -h
+dotnet aspnet-codegenerator identity -dc CovidOutApp.Web.Data.ApplicationDbContext
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet aspnet-codegenerator identity -dc CovidOutApp.Web.Data.ApplicationDbContext
