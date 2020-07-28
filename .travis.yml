@@ -7,7 +7,7 @@ install:
 jobs:
   include:
     - stage: test
-      script: - dotnet test CovidOutApp.Tests/CovidOutApp.Tests.csproj
+      script: dotnet test CovidOutApp.Tests/CovidOutApp.Tests.csproj
     - stage: build
       script: dotnet build CovidOutApp.Web/CovidOutApp.Web.csproj
 
