@@ -23,7 +23,7 @@ namespace CovidOutApp.Web.ServiceLayer {
                 throw new NullReferenceException("Venue Cannot be null");
 
             if (venue.Id == null)
-                throw new Exception("Id must be specified");
+                venue.Id = Guid.NewGuid();
             
             try {
                 this._venueRepository.Add(venue);
@@ -36,7 +36,7 @@ namespace CovidOutApp.Web.ServiceLayer {
 
         public void DeleteVenue(Guid id)
         {
-            if (id == null) throw new NullReferenceException("Id cannot be null");
+            if (id == Guid.Empty) throw new NullReferenceException("Id cannot be null");
 
             try {
                 var venue = this.GetVenueById(id);
