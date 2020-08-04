@@ -10,9 +10,8 @@ namespace CovidOutApp.Web.Repositories {
     public abstract class GenericRepository<T> : IGenericRepository<T>
     where T: class
     {
-        private readonly ApplicationDbContext _dbContext;
-        private readonly DbSet<T> dbSet; 
-
+        protected readonly ApplicationDbContext _dbContext;
+        protected readonly DbSet<T> dbSet; 
         private readonly ILogger<GenericRepository<T>> _logger;
         public GenericRepository(ILogger<GenericRepository<T>> logger, ApplicationDbContext db){
            

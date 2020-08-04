@@ -1,0 +1,50 @@
+@using CovidOutApp.Web.Enums
+@model CovidOutApp.Web.ViewModels.VenueRegistrationApplicationViewModel
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+
+<h4>Register your venue</h4>
+<hr />
+<div class="row">
+    <div class = "col-md-12">
+        <p><strong>You are registering the following Venue</strong></p>
+        <p><strong>Name</strong>:@ViewData["VenueName"]</p>
+        <p><strong>Address:</strong>@ViewData["VenueAddress"]</p>
+    </div>
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            
+            <div class="form-group">
+                @Html.LabelFor(m => m.VerificationMethod,"Please Select Verification Method")
+                @Html.DropDownListFor(m => m.VerificationMethod, Html.GetEnumSelectList<Verification_Method>(), "Select", new { @class = "form-control" })
+            
+            </div>
+
+             <div class="form-group">
+                 <input type="hidden" asp-for="VenueId"/>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-controller="Venue">Back my Venues</a>
+</div>
+
+</body>
+</html>

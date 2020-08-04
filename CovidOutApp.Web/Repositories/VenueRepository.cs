@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 
 namespace CovidOutApp.Web.Repositories {
-    public class VenueRepository :GenericRepository<Venue>, IVenueRepository
+    public class VenueRepository : GenericRepository<Venue>, IVenueRepository
     {
         public VenueRepository(ILogger<GenericRepository<Venue>> logger, ApplicationDbContext db) 
         : base(logger, db){}

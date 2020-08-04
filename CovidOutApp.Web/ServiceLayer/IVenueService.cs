@@ -8,9 +8,11 @@ namespace CovidOutApp.Web.ServiceLayer {
     {   
         IEnumerable<Venue> SearchVenue(string name);
         IEnumerable<Venue> GetAllVenues();
+        IEnumerable<Venue> GetVenuesOwnedByUser(string userId);
         Venue GetVenueById(Guid id);
         void CreateVenue(Venue venue);
         void DeleteVenue (Guid id);
         void EditVenueDetails(Guid id);
+
     }
 }

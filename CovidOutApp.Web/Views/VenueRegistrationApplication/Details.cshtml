@@ -1,0 +1,81 @@
+@model CovidOutApp.Web.ViewModels.VenueRegistrationApplicationViewModel
+
+@{
+      Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+
+<div>
+    <h4>Application for @Model.VenueDetails.Name</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            Application Date:  @Html.DisplayFor(model => model.DateCreated)
+        </div>
+        <div class="col-md-6">
+            Applied By:  @Html.DisplayFor(model => model.AppliedBy.FirstName) @Html.DisplayFor(model => model.AppliedBy.LastName)
+        </div>
+    </div>
+      @if (@Model.VenueDetails != null){
+          <div class="row">
+                <div class="col-md-6">
+                    @Html.DisplayNameFor(model => model.VenueDetails.Name)
+                    @Html.DisplayFor(model => model.VenueDetails.Name)
+                </div>
+                <div class="col-md-6">
+                    @Html.DisplayNameFor(model => model.VenueDetails.Address)
+                    @Html.DisplayFor(model => model.VenueDetails.Address)
+                </div>
+            </div>
+            <div class="row">
+                    <div class="col-md-6">
+                        @Html.DisplayNameFor(model => model.VenueDetails.Open)
+                        @Html.DisplayFor(model => model.VenueDetails.Open)
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DisplayNameFor(model => model.VenueDetails.City)
+                        @Html.DisplayFor(model => model.VenueDetails.City)
+                    </div>
+            </div>
+      }
+</div>
+
+<div style="padding:2%">#
+    @if (Model.ApprovedBy == null){
+        <form asp-action="Approve" method="POST">
+        @Html.HiddenFor(model => model.Id)
+        <button id="Approve" class="btn btn-primary">Approve</button>
+        <button id="Cancel" class="btn btn-primary">Cancel</button>
+    </form>
+    }
+    else {
+        <div class="alert alert-success">
+            <strong>Approved!</strong> The application has been approved by @Model.ApprovedBy.FirstName @Model.ApprovedBy.LastName 
+        </div>
+        <div>
+            <a asp-action='Index'>Back to Applications</a>
+        </div>
+        
+    }
+    
+</div>
+@section scripts {
+<script>
+    $("#Cancel").click(function(event){
+        event.preventDefault();
+        window.location.href = "/VenueRegistrationApplication/Index";
+});    
+</script>
+
+}
+</body>
+</html>
+

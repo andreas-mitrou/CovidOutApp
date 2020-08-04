@@ -12,19 +12,27 @@ using Microsoft.AspNetCore.Authorization;
 using CovidOutApp.Web.Repositories;
 using CovidOutApp.Web.ServiceLayer;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
 
 namespace CovidOutApp.Web.Controllers
 {
     [Authorize(Roles = "Admin, VenueOwner")] 
-    public class VenueController : Controller
+    public class VenueController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly IVenueService _venueService;
+
+        private readonly IVenueRegistrationService _venueRegService;
         private readonly ILogger<VenueController> _logger;
 
-        public VenueController(ApplicationDbContext context, IVenueService venueService, ILogger<VenueController> logger)
+        public VenueController(ApplicationDbContext context, 
+                               IVenueService venueService, 
+                               IVenueRegistrationService venueRegistrationService,
+                               UserManager<ApplicationUser> userManager, 
+                               ILogger<VenueController> logger) : base (logger,userManager)
         {
             _venueService = venueService;
+            _venueRegService = venueRegistrationService;
             _logger = logger;
             _context = context;
         }
@@ -33,15 +41,46 @@ namespace CovidOutApp.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var venues = new List<VenueViewModel>();
-            
-            var venuesDb = this._venueService.GetAllVenues().ToList();
 
-            Action<Venue> mapToViewModel= venue => {
-                var venueItem = new VenueViewModel {Name = venue.Name, Id = venue.Id};
-                venues.Add(venueItem);
-            }; 
+            IEnumerable<Venue> venuesDb = null;
+        
+            try
+            {
+                 if (User.IsInRole("Admin")){
+                    venuesDb = this._venueService.GetAllVenues().ToList();
+                }
+                else if (User.IsInRole("VenueOwner")){
+                    var user = await this.GetUserIdAsync();
+                    venuesDb = this._venueService.GetVenuesOwnedByUser(user.Id.ToString()).ToList();
+                }
+                
+                if (venuesDb != null){
+                        Action<Venue> mapToViewModel = venue => {
+                        var venueItem = new VenueViewModel {Name = venue.Name, Id = venue.Id};
+                        var relatedApplication = _venueRegService.FindApplicationByVenueId(venue.Id);
+                        if (relatedApplication != null){
+                            if (relatedApplication.ApprovedBy != null){
+                                venueItem.IsApproved = true;
+                            }
+                            else {
+                                  venueItem.IsApproved = false;
+                            }
+                        }
+                        else {
+                            venueItem.IsApproved = null;
+                        }
+    
+                        venues.Add(venueItem);
+                    }; 
 
-            venuesDb.ForEach(mapToViewModel);
+                    venuesDb.ToList().ForEach(mapToViewModel);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                ModelState.AddModelError("Error", ex.Message);
+            }
 
             return View(venues);
         }
@@ -87,8 +126,10 @@ namespace CovidOutApp.Web.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name, Address, City, Email, Telephone")] VenueViewModel venue)
+        public async Task<IActionResult> Create(VenueViewModel venue)
         {
+            ModelState.Remove("Id");
+            
             if (ModelState.IsValid)
             {
                 var dbVenue = new Venue();
@@ -103,7 +144,11 @@ namespace CovidOutApp.Web.Controllers
                 dbVenue.TimeCloses = venue.Close;
 
                 try {
+                       var userDetails = await GetUserIdAsync();
+                       dbVenue.OwnerUserId = userDetails.Id;
+                      
                       _venueService.CreateVenue(dbVenue);
+                      
                       return RedirectToAction(nameof(Index));
                 }
                 catch(Exception ex){

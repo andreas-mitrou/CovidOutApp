@@ -26,14 +26,23 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+        string rowClassName = "";
+        if (item.IsApproved == false){
+            rowClassName = "table-warning";
+        }
+        <tr class="@rowClassName">
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> 
+                @if (item.IsApproved == null) {
+                    <span>|</span>
+                    @Html.ActionLink("Register","Create","VenueRegistrationApplication",new {venueId = item.Id})   
+                }
+               
             </td>
         </tr>
 }

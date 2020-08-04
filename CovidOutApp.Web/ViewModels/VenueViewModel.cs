@@ -14,5 +14,6 @@ namespace CovidOutApp.Web.ViewModels {
         public TimeSpan Open {get;set;}
         public TimeSpan Close {get;set;}
         public IEnumerable<string> Images {get;set;}
+        public bool? IsApproved {get;set;}
     }
 }

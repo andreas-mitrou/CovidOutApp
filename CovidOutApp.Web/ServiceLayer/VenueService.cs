@@ -25,6 +25,10 @@ namespace CovidOutApp.Web.ServiceLayer {
             if (venue.Id == null)
                 venue.Id = Guid.NewGuid();
             
+            
+            if (venue.OwnerUserId == null)
+                throw new NullReferenceException("Venue should have an owner");
+
             try {
                 this._venueRepository.Add(venue);
             }
@@ -105,8 +109,23 @@ namespace CovidOutApp.Web.ServiceLayer {
             }
         }
 
+        public IEnumerable<Venue> GetVenuesOwnedByUser(string userId)
+        {
+            if (userId == null || userId == Guid.Empty.ToString())
+                throw new Exception("User Id cannot be null");
 
-        
+            try
+            {
+                var userVenues = this._venueRepository.Query(x=>x.OwnerUserId == userId);
+                return userVenues;       
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                throw;
+            } 
+        }
+
         public IEnumerable<Venue> SearchVenue(string name)
         {
             throw new NotImplementedException();

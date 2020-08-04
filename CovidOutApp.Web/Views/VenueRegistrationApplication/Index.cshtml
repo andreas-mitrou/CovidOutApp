@@ -1,0 +1,73 @@
+@model IEnumerable<CovidOutApp.Web.ViewModels.VenueRegistrationApplicationViewModel>
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.VenueDetails.Name)
+            </th>
+             <th>
+                @Html.DisplayNameFor(model => model.VenueDetails.Address)
+            </th>
+             <th>
+                @Html.DisplayNameFor(model => model.VenueDetails.City)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateAppoved)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @if(item.ApprovedBy != null){
+                    <img src="~/images/approved-icon.png" width="50%" height="50%"/>
+                }               
+            </td>
+            <td>
+                @Html.DisplayFor(ModelItem =>item.VenueDetails.Name)
+            </td>
+             <td>
+                @Html.DisplayFor(ModelItem => item.VenueDetails.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(ModelItem => item.VenueDetails.City)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCreated)
+            </td>
+            <td>
+                 @if(item.ApprovedBy != null){
+                     @Html.DisplayFor(modelItem => item.DateAppoved)
+                 }    
+               
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Show Application</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
