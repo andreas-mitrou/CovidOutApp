@@ -13,6 +13,9 @@ namespace CovidOutApp.Web.ServiceLayer {
         void CreateVenue(Venue venue);
         void DeleteVenue (Guid id);
         void EditVenueDetails(Guid id);
-
+        bool CheckInVisitor(Visit venueVisit); 
+        bool CheckOutVisitor(Visit venueVisit);
+        Visit FindVisitByVenueIdAndUser(Guid venueId, ApplicationUser user);
+        bool UserHasCheckedOut(Venue venue, ApplicationUser user);
     }
 }

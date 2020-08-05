@@ -32,6 +32,7 @@ namespace CovidOutApp.Web
         private void CofigureRepositoriesDI(IServiceCollection services){
             services.AddTransient<IVenueRepository,VenueRepository>();
             services.AddTransient<IVenueRegistrationApplicationRepository,VenueRegistrationApplicationRepository>();
+            services.AddTransient<IVenueVisitRepository, VenueVisitRepository>();
         }
 
         private void CofigureServicesDI(IServiceCollection services){

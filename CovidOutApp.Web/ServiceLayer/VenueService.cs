@@ -4,16 +4,19 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using CovidOutApp.Web.Data;
+using System.Linq;
 
 namespace CovidOutApp.Web.ServiceLayer {
     public class VenueService: IVenueService {
 
         private readonly IVenueRepository _venueRepository;
+        private readonly IVenueVisitRepository _venueVisitRepository;
         private readonly ILogger<VenueService> _logger;
 
-        public VenueService(IVenueRepository repository, ILogger<VenueService> logger)
+        public VenueService(IVenueRepository repository, IVenueVisitRepository visitRepository, ILogger<VenueService> logger)
         {   
             this._venueRepository = repository;
+            this._venueVisitRepository = visitRepository;
             this._logger = logger;
         }
 
@@ -109,6 +112,44 @@ namespace CovidOutApp.Web.ServiceLayer {
             }
         }
 
+        public bool CheckOutVisitor(Visit venueVisit){
+            bool result = false;
+            try
+            {
+                if (venueVisit == null)
+                    throw new Exception ("Venue Visit is null");
+
+                _venueVisitRepository.Update(venueVisit); 
+                
+                result = true;   
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                throw;
+            }
+            return result;
+        }
+        public bool CheckInVisitor(Visit venueVisit){
+            bool result = false;
+
+            if (venueVisit == null)
+                throw new NullReferenceException("Null visit");
+            
+            try
+            {
+                this._venueVisitRepository.Add(venueVisit);
+                result = true;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                throw;
+            }
+
+            return result;
+        }
+
         public IEnumerable<Venue> GetVenuesOwnedByUser(string userId)
         {
             if (userId == null || userId == Guid.Empty.ToString())
@@ -129,6 +170,51 @@ namespace CovidOutApp.Web.ServiceLayer {
         public IEnumerable<Venue> SearchVenue(string name)
         {
             throw new NotImplementedException();
+        }
+
+        public bool UserHasCheckedId(Venue venue, ApplicationUser user){
+             var userVenueVisits = this._venueVisitRepository.Query(x=>x.Venue.Id == venue.Id &&
+                                                                 x.User.Id == user.Id); 
+             if (userVenueVisits.Count() > 0){
+                 foreach (var venueVisit in userVenueVisits)
+                 {
+                     if (venueVisit.CheckOut < venueVisit.CheckIn){
+                         return true;
+                     }
+                 }
+             }
+
+             return false;
+            
+        }
+        public bool UserHasCheckedOut(Venue venue, ApplicationUser user)
+        {
+            var userVenueVisits = this._venueVisitRepository.Query(x=>x.Venue.Id == venue.Id &&
+                                                                 x.User.Id == user.Id);
+            if (userVenueVisits.Count() > 0){
+                foreach (var visit in userVenueVisits)
+                {
+                    if (visit.CheckOut < visit.CheckIn){
+                        return false;
+                    }
+                }
+            }                                                    
+            
+            return true;
+        }
+
+        public Visit FindVisitByVenueIdAndUser(Guid venueId, ApplicationUser user)
+        {
+            try {
+                  var userVenueVisits = this._venueVisitRepository.QueryIncludeRelatedData(
+                                                                 x=> x.Venue.Id == venueId &&
+                                                                 x.User.Id == user.Id);
+                  return userVenueVisits.SingleOrDefault();
+            }
+            catch (Exception ex){
+                this._logger.LogError(ex.StackTrace);
+                throw;
+            }
         }
     }
 }

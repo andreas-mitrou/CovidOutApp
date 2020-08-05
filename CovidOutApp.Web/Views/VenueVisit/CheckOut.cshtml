@@ -1,0 +1,36 @@
+@model CovidOutApp.Web.ViewModels.VenueCheckOutViewModel
+
+@{
+      Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>CheckOut</title>
+</head>
+<body>
+<div class="container">
+    <h4>CheckIn @Model.VenueDetails.Name</h4>
+    <hr />
+    <div id="venue-details-panel" class='row'>
+        @Html.Partial("VenueDetailsPartial",Model.VenueDetails)
+    </div>
+    <div class="row">
+        <strong>@Html.LabelFor(m=>m.Comments)</strong>
+        @Html.TextAreaFor(m=>m.Comments, new { @class = "form-control form-control-full", rows = 8})
+    </div>
+    <div id="venue-check-in">
+        <form asp-action="CheckOut">
+            @Html.HiddenFor(m=>m.VenueId)
+            <div>
+                <button id ='check-in-btn'class='btn btn-primary'>Check Out</button>
+                <button id ='cancel-btn'class='btn btn-primary'>Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

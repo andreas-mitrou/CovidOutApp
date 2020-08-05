@@ -1,0 +1,51 @@
+@model CovidOutApp.Web.ViewModels.VenueViewModel
+
+<div style="height:100%" class="container">
+     
+            @if (Model != null){
+      
+                 <h4>@Model.Name</h4>
+                <hr />
+                
+                    <div class="row" id='venue-logo' style='height:20%'>
+                        <div class="col-md-12">
+                            <img src="~/logo.png" />
+                        </div>
+                    </div>
+                <div style='height:80%' >
+                    <div class='row'>
+                        <div class = "col-md-6">
+                            <strong>@Html.DisplayNameFor(model => model.Address)</strong>
+                            @Html.DisplayFor(model => model.Address)
+                        </div>
+                        <div class = "col-md-6">
+                            <strong>@Html.DisplayNameFor(model => model.City)</strong>
+                            @Html.DisplayFor(model => model.City)
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class = "col-md-6">
+                            <strong>@Html.DisplayNameFor(model => model.Telephone)</strong>
+                            @Html.DisplayFor(model => model.Telephone)
+                        </div>
+                        <div class = "col-md-6">
+                            <strong>@Html.DisplayNameFor(model => model.Email)</strong>
+                            @Html.DisplayFor(model => model.Email)
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class = "col-md-6">
+                            <strong>Opens</strong>
+                            @Html.DisplayFor(model => model.Open) -
+                            <strong>Closes</strong>
+                            @Html.DisplayFor(model => model.Open)
+                        </div>
+                        <div class = "col-md-6">
+                             <strong>Capacity</strong>
+                            @Html.DisplayFor(model => model.Capacity)
+                        </div>
+                    </div>
+                </div>
+        }
+<div>
+

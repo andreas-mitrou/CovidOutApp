@@ -1,0 +1,32 @@
+@model CovidOutApp.Web.ViewModels.VenueCheckInViewModel
+
+@{
+      Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>CheckIn</title>
+</head>
+<body>
+<div>
+    <h4>CheckIn @Model.VenueDetails.Name</h4>
+    <hr />
+    <div id="venue-details-panel" class='row'>
+        @Html.Partial("VenueDetailsPartial",Model.VenueDetails)
+    </div>
+    <div id="venue-check-in">
+        <form asp-action="Checkin">
+            @Html.HiddenFor(m=>m.VenueId);
+            <div>
+                <button id ='check-in-btn'class='btn btn-primary'>Check In</button>
+                <button id ='cancel-btn'class='btn btn-primary'>Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
