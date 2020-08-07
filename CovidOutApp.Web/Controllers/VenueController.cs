@@ -84,16 +84,25 @@ namespace CovidOutApp.Web.Controllers
 
             return View(venues);
         }
-
         // GET: Venue/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             
-            try {
+            try { 
+
                 var dbVenueItem = this._venueService.GetVenueById(id.Value);
-                
+
                 if (dbVenueItem == null)  return NotFound();    
-               
+
+                var currentUser = await GetUserIdAsync();
+
+                if (currentUser != null){
+                    
+                    ViewBag.UserHasCheckedIn = this._venueService.UserHasCheckedIn(dbVenueItem, currentUser);
+                
+                    ViewBag.UserHasCheckedOut  = this._venueService.UserHasCheckedOut(dbVenueItem, currentUser); 
+                }
+                
                 VenueViewModel venueVM = new VenueViewModel {
                             Id = dbVenueItem.Id,
                             Name = dbVenueItem.Name,

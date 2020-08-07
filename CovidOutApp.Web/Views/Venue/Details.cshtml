@@ -12,9 +12,20 @@
     <title>Details</title>
 </head>
 <body>
-<div asp-validation-summary="All"></div>
-@Html.Partial("VenueDetailsPartial", Model)  
-<a asp-action="Index">Back to List</a>
+    <div asp-validation-summary="All"></div>
+    @Html.Partial("VenueDetailsPartial", Model)  
 
+    <div id="toolbar" style="padding:2%;">
+        @if (!ViewBag.UserHasCheckedIn){
+            @Html.ActionLink("Check In","CheckIn","VenueVisit", new {venueId = Model.Id}, new { @class = "btn btn-primary"})
+        }
+        else {
+            if (!ViewBag.UserHasCheckedOut){
+                <div class="alert alert-success">You are already checked in</div>
+                @Html.ActionLink("Check Out","CheckOut","VenueVisit", new {venueId = Model.Id}, new { @class = "btn btn-primary"})
+            }
+        }
+        @Html.ActionLink("Back to List","Index", new {venueId = Model.Id}, new { @class = "btn btn-primary"})
+    </div>
 </body>
 </html>

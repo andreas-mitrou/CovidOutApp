@@ -1,0 +1,24 @@
+@model CovidOutApp.Web.ViewModels.VenueVisitViewModel
+@{
+    ViewData["Title"] = "Choose Checki Method";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class='row'>
+        <div class="col-md-6">
+            <div style="width:100%;text-align:center">
+                <img src="~/images/qrCode.png" width="25%" height="70%"/>
+            </div>
+            <div style="width:100%;text-align:center">Use a QR code reader to chekin</div>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="VenueVisit" asp-action="SearchVenue">
+                <div style="width:100%;text-align:center">
+                    <img src="~/images/search.png" width="25%" height="70%"/>
+                </div>
+                <div style="width:100%;text-align:center">Click here to find the venue</div>
+            </a>
+        </div>
+    </div>
+</div>

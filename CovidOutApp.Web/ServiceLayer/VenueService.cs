@@ -168,11 +168,16 @@ namespace CovidOutApp.Web.ServiceLayer {
         }
 
         public IEnumerable<Venue> SearchVenue(string name)
-        {
-            throw new NotImplementedException();
+        {   
+            if (String.IsNullOrEmpty(name))
+                return Enumerable.Empty<Venue>();
+                
+            var venuesResult = this._venueRepository.Query(x=>x.Name.Contains(name));
+            return venuesResult;
         }
 
-        public bool UserHasCheckedId(Venue venue, ApplicationUser user){
+        public bool UserHasCheckedIn(Venue venue, ApplicationUser user){
+
              var userVenueVisits = this._venueVisitRepository.Query(x=>x.Venue.Id == venue.Id &&
                                                                  x.User.Id == user.Id); 
              if (userVenueVisits.Count() > 0){
@@ -194,7 +199,7 @@ namespace CovidOutApp.Web.ServiceLayer {
             if (userVenueVisits.Count() > 0){
                 foreach (var visit in userVenueVisits)
                 {
-                    if (visit.CheckOut < visit.CheckIn){
+                    if (visit.CheckOut == DateTime.MinValue || visit.CheckOut == null){
                         return false;
                     }
                 }
@@ -202,14 +207,27 @@ namespace CovidOutApp.Web.ServiceLayer {
             
             return true;
         }
+        
+        public IEnumerable<Visit> FindVisitsByUser(ApplicationUser user){
+            try
+            {
+                var userVenueVisits = this._venueVisitRepository.QueryIncludeRelatedData(x=> x.User.Id == user.Id); 
 
-        public Visit FindVisitByVenueIdAndUser(Guid venueId, ApplicationUser user)
+                return  userVenueVisits;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                throw;
+            }
+        }
+        public IEnumerable<Visit> FindVisitsByVenueIdAndUser(Guid venueId, ApplicationUser user)
         {
             try {
                   var userVenueVisits = this._venueVisitRepository.QueryIncludeRelatedData(
                                                                  x=> x.Venue.Id == venueId &&
                                                                  x.User.Id == user.Id);
-                  return userVenueVisits.SingleOrDefault();
+                  return userVenueVisits;
             }
             catch (Exception ex){
                 this._logger.LogError(ex.StackTrace);

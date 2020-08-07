@@ -1,0 +1,42 @@
+
+@{
+       Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="search-box" class="row">
+    
+        <div class="form-inline">
+            <input type="text" placeholder="Please type the name of the venue" id="search-input" style="width:500px" class="form-control"/>
+            <button class="btn btn-primary" id="search-btn">Search</button>
+        </div>
+   
+</div>
+ <div id="search-results" class="row"></div>
+@section scripts {
+    <script>
+     
+           // alert("hi");
+             $("#search-btn").click(function(e){
+                 debugger;
+                  $.ajax({
+                    url:"SearchVenue",
+                    method:"POST",
+                    data:{term: $("#search-input").val()},
+                    dataType:"html",
+                    success:function(htmlView){
+                        console.log(htmlView);
+                        $("#search-results").html(htmlView);
+                    },
+                    error:function(xhr){
+                        console.log(xhr)
+                    }
+                });
+                 //alert("HI Man");
+               
+            });  
+             
+    
+    </script>
+}
+

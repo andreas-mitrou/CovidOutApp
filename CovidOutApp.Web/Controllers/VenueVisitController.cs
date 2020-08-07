@@ -45,14 +45,27 @@ namespace CovidOutApp.Web.Controllers
         public async Task<IActionResult> CheckIn(VenueCheckInViewModel checkIn){
 
             var venueViewModel = new VenueViewModel();
+            
             try
             {
+               var currentUser = await GetUserIdAsync();
+
                var venueVisit = new Visit {
                    CheckIn = DateTime.Now,
                    Venue =  this._venueService.GetVenueById(checkIn.VenueId),
-                   User = await GetUserIdAsync()
+                   User = currentUser
                };
+               
+               var allUserVisits = this._venueService.FindVisitsByUser( currentUser);
 
+               foreach (var userVisit in allUserVisits)
+               {
+                   if (userVisit.CheckOut == DateTime.MinValue ||
+                       userVisit.CheckOut == null) {
+                            throw new Exception($"You have already checked in { userVisit.Venue.Name }");
+                        }
+               }
+               
                this._venueService.CheckInVisitor(venueVisit);              
             }
             catch (System.Exception ex)
@@ -77,17 +90,17 @@ namespace CovidOutApp.Web.Controllers
                 if (venueDb == null)
                     throw new Exception("venue was not found");
 
-                    venueCheckInViewModel.VenueId = venueDb.Id;
+                venueCheckInViewModel.VenueId = venueDb.Id;
 
-                    var venueViewModel = new VenueViewModel {
-                        Name = venueDb.Name,
-                        Email = venueDb.Email,
-                        Telephone = venueDb.Telephone,
-                        Address = venueDb.Address,
-                        Capacity = venueDb.Capacity
-                    };
+                var venueViewModel = new VenueViewModel {
+                    Name = venueDb.Name,
+                    Email = venueDb.Email,
+                    Telephone = venueDb.Telephone,
+                    Address = venueDb.Address,
+                    Capacity = venueDb.Capacity
+                };
 
-                    venueCheckInViewModel.VenueDetails = venueViewModel;
+                venueCheckInViewModel.VenueDetails = venueViewModel;
                      
             }
             catch (System.Exception ex)
@@ -105,16 +118,20 @@ namespace CovidOutApp.Web.Controllers
             var venueViewModel = new VenueViewModel();
             try
             {
-               var userVisit = this._venueService.FindVisitByVenueIdAndUser(checkOut.VenueId, await GetUserIdAsync());
+               var userVisits = this._venueService.FindVisitsByVenueIdAndUser(checkOut.VenueId, await GetUserIdAsync());
 
-                if (userVisit == null){
-                    throw new Exception("Visit was not found");
-                }
+                foreach (var visit in userVisits)
+                {
+                    if (visit.CheckOut == DateTime.MinValue || visit.CheckOut == null){
+                        
+                        visit.CheckOut = DateTime.Now;
+                        visit.UserComments = checkOut.Comments;
 
-                userVisit.CheckOut = DateTime.Now;
-                userVisit.UserComments = checkOut.Comments;
-
-               this._venueService.CheckOutVisitor(userVisit);              
+                        this._venueService.CheckOutVisitor(visit);
+                        
+                        break;    
+                    }
+                }     
             }
             catch (System.Exception ex)
             {
@@ -180,6 +197,39 @@ namespace CovidOutApp.Web.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+        
+
+        public IActionResult SearchVenue(){
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SearchVenue(string term){
+
+            List<VenueViewModel> results = new List<VenueViewModel>();
+            
+            try
+            {
+                var resultsDb = this._venueService.SearchVenue(term); 
+
+                foreach (var venue in resultsDb)
+                {
+                    results.Add(new VenueViewModel {
+                        Id = venue.Id,
+                        Name = venue.Name,
+                        Address = venue.Address,
+                        Telephone = venue.Telephone
+                    });
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                ModelState.AddModelError("SearchError", ex.Message);
+            }
+
+            return PartialView("SearchVenueResults", results);
         }
 
         public IActionResult SearchVenues(string term){
