@@ -48,6 +48,7 @@ namespace CovidOutApp.Web.Controllers
             
             try
             {
+               var venueDb = this._venueService.GetVenueById(checkIn.VenueId);
                var currentUser = await GetUserIdAsync();
 
                var venueVisit = new Visit {
@@ -60,8 +61,12 @@ namespace CovidOutApp.Web.Controllers
 
                foreach (var userVisit in allUserVisits)
                {
-                   if (userVisit.CheckOut == DateTime.MinValue ||
-                       userVisit.CheckOut == null) {
+                   if (userVisit.CheckOut == DateTime.MinValue ||  userVisit.CheckOut == null) {
+                           checkIn.VenueDetails = new VenueViewModel {
+                             Name = venueDb.Name,
+                             Address = venueDb.Address,
+                             Telephone = venueDb.Telephone,
+                           };
                             throw new Exception($"You have already checked in { userVisit.Venue.Name }");
                         }
                }
