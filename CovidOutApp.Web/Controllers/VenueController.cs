@@ -13,6 +13,7 @@ using CovidOutApp.Web.Repositories;
 using CovidOutApp.Web.ServiceLayer;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 
 namespace CovidOutApp.Web.Controllers
 {
@@ -56,8 +57,11 @@ namespace CovidOutApp.Web.Controllers
                 
                 if (venuesDb != null){
                         Action<Venue> mapToViewModel = venue => {
+                        
                         var venueItem = new VenueViewModel {Name = venue.Name, Id = venue.Id};
+                        
                         var relatedApplication = _venueRegService.FindApplicationByVenueId(venue.Id);
+                        
                         if (relatedApplication != null){
                             if (relatedApplication.ApprovedBy != null){
                                 venueItem.IsApproved = true;
@@ -84,14 +88,134 @@ namespace CovidOutApp.Web.Controllers
 
             return View(venues);
         }
+
+
+        [HttpPost] 
+        public async Task<IActionResult> UploadImage(ImageUploadViewModel image, IFormFile file){
+            
+            if (ModelState.IsValid){
+
+                if (image.VenueId == null){
+                    throw new Exception ("Venue id cannot be null");
+                }
+
+                try {
+                     if (file != null) {
+
+                          var imageDb = new Image();
+                          imageDb.Id = Guid.NewGuid();
+                          imageDb.Name = image.Title;
+                          imageDb.Venue = this._venueService.GetVenueById(image.VenueId);
+                   
+                          bool successImageStored = await this._venueService.AddImageAsync(imageDb, file, image.IsLogoImage);
+                     
+                     }     
+                        return new RedirectToActionResult("Images","Venue", new { id = image.VenueId});
+                    
+                }
+                catch (Exception ex){
+                    this._logger.LogError(ex.StackTrace);
+                    ModelState.AddModelError("Error", ex.Message);
+                }
+            }
+
+            return View (image);
+        }
+
+
+        public IActionResult DeleteImageLogo(Guid? venueId){
+            if (venueId == null){
+                return NotFound();
+            }
+
+            try {
+                this._venueService.DeleteVenueLogoImage(venueId.Value);
+                return RedirectToAction("Images", new {id = venueId});
+            }
+            catch(Exception ex){
+                this._logger.LogError(ex.StackTrace);
+                ViewBag.ErrorText = ex.Message;
+            }
+
+            return RedirectToAction("Images", new {id = venueId.Value});
+        }
+
+        public IActionResult DeleteImage(Guid? id, string venueId){
+            if (id == null)
+                return NotFound();
+
+            try
+            {   
+                this._venueService.DeleteImage(id.Value);   
+            }
+            catch (System.Exception ex)
+            {
+                this._logger.LogError(ex.Message);
+            }
+
+            return RedirectToAction("Images", new {id = venueId});
+        }
+
+        public IActionResult Images(Guid? id){
+            
+            var imageList = new VenueImageListViewModel();
+
+            var imagesVM = new List<VenueImageViewModel>();
+            
+            ViewBag.VenueId = id;
+            
+            try
+            {
+                if (id == null)
+                    throw new Exception("Guid is null");
+
+                var images = this._venueService.GetVenueImages(id.Value);
+        
+                foreach(var image in images){
+
+                    var imageVM = new VenueImageViewModel();
+                    imageVM.Title = image.Name;
+                    imageVM.FilePath = image.ImagePath;
+                    imageVM.Id = image.Id;
+                    imageVM.VenueId = id.Value.ToString();
+                    imageVM.isLogoImage = false;
+
+                    imagesVM.Add(imageVM);
+                }
+
+                var venueDetails = this._venueService.GetVenueById(id.Value);
+
+                if (venueDetails != null && !String.IsNullOrEmpty(venueDetails.Logo)){
+
+                    imagesVM.Add(new VenueImageViewModel {
+                        Title = "Logo",
+                        FilePath = venueDetails.Logo,
+                        VenueId = id.Value.ToString(),
+                        isLogoImage = true
+                    });
+                }
+
+                imageList.Images = imagesVM;
+
+                imageList.UploadImage = new ImageUploadViewModel {
+                    VenueId = id.Value
+                };
+            }
+            catch (System.Exception ex)
+            {
+                ModelState.AddModelError("Error", ex.Message);
+            }
+            
+            return View(imageList);
+        }
+
         // GET: Venue/Details/5
         public async Task<IActionResult> Details(Guid? id)
-        {
-            
+        {         
             try { 
 
                 var dbVenueItem = this._venueService.GetVenueById(id.Value);
-
+        
                 if (dbVenueItem == null)  return NotFound();    
 
                 var currentUser = await GetUserIdAsync();
@@ -102,7 +226,19 @@ namespace CovidOutApp.Web.Controllers
                 
                     ViewBag.UserHasCheckedOut  = this._venueService.UserHasCheckedOut(dbVenueItem, currentUser); 
                 }
-                
+
+                var venueImages = this._venueService.GetVenueImages(id.Value);
+
+                var venueImagesVM = new List<VenueImageViewModel>();
+
+                foreach (var img in venueImages)
+                {
+                    venueImagesVM.Add(new VenueImageViewModel {
+                        Title = img.Name, 
+                        FilePath = img.ImagePath , 
+                        Id = img.Id }
+                    );
+                }
                 VenueViewModel venueVM = new VenueViewModel {
                             Id = dbVenueItem.Id,
                             Name = dbVenueItem.Name,
@@ -112,7 +248,9 @@ namespace CovidOutApp.Web.Controllers
                             Email = dbVenueItem.Email,
                             Capacity = dbVenueItem.Capacity,
                             Open = dbVenueItem.TimeOpens,
-                            Close = dbVenueItem.TimeCloses
+                            Close = dbVenueItem.TimeCloses,
+                            Logo = dbVenueItem.Logo,
+                            Images = venueImagesVM
                 };
 
                 return View(venueVM);           

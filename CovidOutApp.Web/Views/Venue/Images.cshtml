@@ -1,0 +1,54 @@
+@model CovidOutApp.Web.ViewModels.VenueImageListViewModel
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Images</title>
+</head>
+<body>
+<div id="table-container" style="max-height:50%; overflow-y:scroll;">
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+             <th>
+               Photo
+            </th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Images) {
+
+        <tr>
+            <td style="vertical-align:middle">
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td style="text-align:center">
+                 <img src="@item.FilePath" height="35%" width="35%" />            
+            </td>
+            <td style="vertical-align:middle">
+                @if (item.isLogoImage){
+                    @Html.ActionLink("Delete","DeleteImageLogo",new {id = item.Id, venueId = item.VenueId}, new {@class = "btn btn-danger"})
+                }
+                else {
+                    @Html.ActionLink("Delete","DeleteImage",new {id = item.Id, venueId = item.VenueId}, new {@class = "btn btn-danger"})
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</div>
+@{ Html.RenderPartial("UploadImage", Model.UploadImage); }
+    
+</body>
+</html>

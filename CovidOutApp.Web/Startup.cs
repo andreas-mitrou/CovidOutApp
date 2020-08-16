@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using CovidOutApp.Web.Models;
 using CovidOutApp.Web.Repositories;
 using CovidOutApp.Web.ServiceLayer;
+using System.IO;
 
 namespace CovidOutApp.Web
 {
@@ -26,6 +27,7 @@ namespace CovidOutApp.Web
         }
 
         public IConfiguration Configuration { get; }
+    
 
         // This method gets called by the runtime. Use this method to add services to the container.
         
@@ -33,6 +35,7 @@ namespace CovidOutApp.Web
             services.AddTransient<IVenueRepository,VenueRepository>();
             services.AddTransient<IVenueRegistrationApplicationRepository,VenueRegistrationApplicationRepository>();
             services.AddTransient<IVenueVisitRepository, VenueVisitRepository>();
+            services.AddTransient<IVenueImageRepository, VenueImageRepository>();
         }
 
         private void CofigureServicesDI(IServiceCollection services){
@@ -75,6 +78,9 @@ namespace CovidOutApp.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            Globals.FILE_UPLOAD_DIR = Path.Combine(env.WebRootPath,"VenueFiles");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

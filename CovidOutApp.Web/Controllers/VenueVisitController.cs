@@ -83,6 +83,39 @@ namespace CovidOutApp.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        
+        public async Task<IActionResult> CheckInList(){
+            
+            var currentVisits = new List<VenueVisitViewModel>();
+
+            try
+            {
+                var currentUser =  await GetUserIdAsync();
+                var visitsDb = this._venueService.FindVisitsByUser(currentUser);
+
+                foreach (var visitItem in visitsDb)
+                {
+                    if (visitItem.CheckOut == DateTime.MinValue || visitItem.CheckOut == null){
+
+                        var visitVm = new VenueVisitViewModel();
+                        visitVm.Id = visitItem.Id;
+                        visitVm.CheckIn = visitItem.CheckIn;
+                        visitVm.VenueName = visitItem.Venue.Name;
+                        visitVm.VenueId = visitItem.Venue.Id;
+
+                        currentVisits.Add(visitVm);
+                    }  
+                }
+            }
+            catch (System.Exception ex)
+            {
+                this._logger.LogError(ex.StackTrace);
+                ModelState.AddModelError("Error", ex.StackTrace);
+            }
+
+            return View(currentVisits);
+        }
+
         [HttpGet("[controller]/[action]/{venueId}")]
         public IActionResult CheckIn(Guid venueId){
 

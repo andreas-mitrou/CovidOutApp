@@ -38,9 +38,10 @@ namespace CovidOutApp.Tests
 
             var venueRepository = serviceProvider.GetService<IVenueRepository>();
             var venueVisitRepository = serviceProvider.GetService<IVenueVisitRepository>();
+            var venueImagesRepository = serviceProvider.GetService<IVenueImageRepository>();
             var logger = serviceProvider.GetService<ILogger<VenueService>>();
            
-            this.srv = new VenueService(venueRepository, venueVisitRepository, logger);
+            this.srv = new VenueService(venueRepository, venueVisitRepository,venueImagesRepository, logger);
         }
 
         [Test]

@@ -5,18 +5,25 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using CovidOutApp.Web.Data;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace CovidOutApp.Web.ServiceLayer {
     public class VenueService: IVenueService {
 
         private readonly IVenueRepository _venueRepository;
         private readonly IVenueVisitRepository _venueVisitRepository;
+        
+        private readonly IVenueImageRepository _venueImageRepository;
         private readonly ILogger<VenueService> _logger;
 
-        public VenueService(IVenueRepository repository, IVenueVisitRepository visitRepository, ILogger<VenueService> logger)
+        public VenueService(IVenueRepository repository, IVenueVisitRepository visitRepository, 
+                            IVenueImageRepository imageRepository, ILogger<VenueService> logger)
         {   
             this._venueRepository = repository;
             this._venueVisitRepository = visitRepository;
+            this._venueImageRepository = imageRepository;
             this._logger = logger;
         }
 
@@ -58,7 +65,7 @@ namespace CovidOutApp.Web.ServiceLayer {
                 throw;
             }
         }
-
+    
         public void EditVenueDetails(Guid id)
         {
             throw new NotImplementedException();
@@ -80,6 +87,7 @@ namespace CovidOutApp.Web.ServiceLayer {
              throw;
          }
         }
+
 
         public IEnumerable<Venue> GetAllVenues()
         {
@@ -233,6 +241,133 @@ namespace CovidOutApp.Web.ServiceLayer {
                 this._logger.LogError(ex.StackTrace);
                 throw;
             }
+        }
+
+        public IEnumerable<Image> GetVenueImages(Guid venueId)
+        {
+            try
+            {
+                if (venueId == Guid.Empty)
+                    throw new Exception("Guid was empty");
+
+                var images = this._venueImageRepository.QueryIncludeRelatedData(x=>x.Venue.Id == venueId);
+
+                return images;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);   
+                throw;
+            }
+        }
+
+        private async Task<string> SaveImageToFile(IFormFile postedFile, string directory){
+            if (postedFile.Length > 0) {
+                
+                var extension = Path.GetExtension(postedFile.FileName);
+
+                var filePath = Path.Combine(directory, $"{Guid.NewGuid().ToString()}{extension}");
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create)) {
+                    
+                    await postedFile.CopyToAsync(fileStream);
+                }
+                
+                return filePath;
+            }
+
+            return null;
+        }
+        
+
+        public async Task<bool> AddImageAsync(Image imageMetadata, IFormFile imageFile, bool isLogo)
+        {
+            var imageStored = false;
+
+            if (imageMetadata == null)
+                throw new Exception("Image cannot be null");
+
+            try
+            {  
+                if (String.IsNullOrEmpty(Globals.FILE_UPLOAD_DIR))
+                     throw new Exception ("The file upload dir is not specified");
+
+                var filepath = await SaveImageToFile(imageFile, Globals.FILE_UPLOAD_DIR);
+
+                if (String.IsNullOrEmpty(imageMetadata.ImagePath)) {
+
+                    var fileName = Path.GetFileName(filepath);
+
+                    var relativePath = $"/{Path.GetFileName(Globals.FILE_UPLOAD_DIR)}/{fileName}";
+                    
+                    imageMetadata.ImagePath = relativePath;  
+                }
+
+                if (isLogo){
+                    var venue = this._venueRepository.Find(imageMetadata.Venue.Id);
+                    venue.Logo = imageMetadata.ImagePath;
+                    this._venueRepository.Update(venue);
+                }  
+                else {
+                    this._venueImageRepository.Add(imageMetadata);
+                }
+                
+                imageStored = true;
+            }
+            catch (System.Exception ex) 
+            {
+                _logger.LogError(ex.StackTrace);    
+                throw;
+            }
+
+            return imageStored;
+        }
+
+        public bool DeleteImage(Guid id)
+        {
+
+            bool imageDeleted = false;
+            try
+            {
+                var image = _venueImageRepository.Find(id);
+                
+                if (image == null)
+                    throw new Exception("Image was not found!");
+
+                this._venueImageRepository.Delete(image);
+
+                imageDeleted = true;
+                
+            }
+            catch (System.Exception ex)
+            {
+                this._logger.LogError(ex.StackTrace);
+                throw;
+            }
+
+            return imageDeleted;
+        }
+
+        public bool DeleteVenueLogoImage(Guid venueId)
+        {
+           try
+           {
+               var venue = this.GetVenueById(venueId);
+
+               if(venue == null)
+                   throw new Exception("Venue was not found");
+
+               venue.Logo = null;
+
+               this._venueRepository.Update(venue);
+
+               return true;
+           }
+           catch (System.Exception ex)
+           {
+               this._logger.LogError(ex.StackTrace);
+               throw;
+           }
         }
     }
 }

@@ -4,7 +4,7 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container">
+@* <div class="container">
     <div class='row'>
         <div class="col-md-6">
             <div style="width:100%;text-align:center">
@@ -21,4 +21,41 @@
             </a>
         </div>
     </div>
+</div> *@
+
+<div class="text-center">
+    <div class="container">
+        <div class="row">
+           <div class="col-md-12">
+                 <h3 class="display-5" style="padding:5%">Check In Point</h3>
+           </div> 
+        </div>
+        <div class="row text-center" >
+            <div class="col-md-6" id="qr-code">
+                <div class="card" style="width: 80%; margin:0px auto;">
+                    <div style="text-align:center">
+                        <img src="~/images/qrCode.png" height="40%" width="50%"/>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Check in using QR code</h5>
+                        <p class="card-text"></p>
+                        <a href="" class="btn btn-primary">Scan QR Code</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" id="search" >
+                 <div class="card" style="width: 80%;margin:0px auto;">
+                      <div style="text-align:center">
+                        <img src="~/images/search.png" height="40%" width="50%"/>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Search for the venue</h5>
+                        <p class="card-text"></p>
+                        <a asp-controller="VenueVisit" asp-action="SearchVenue" class="btn btn-primary">Search!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+

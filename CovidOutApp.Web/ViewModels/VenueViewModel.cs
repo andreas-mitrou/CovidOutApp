@@ -13,7 +13,8 @@ namespace CovidOutApp.Web.ViewModels {
         public int Capacity {get;set;}
         public TimeSpan Open {get;set;}
         public TimeSpan Close {get;set;}
-        public IEnumerable<string> Images {get;set;}
+        public IEnumerable<VenueImageViewModel> Images {get;set;}
         public bool? IsApproved {get;set;}
+        public string Logo {get;set;}
     }
 }

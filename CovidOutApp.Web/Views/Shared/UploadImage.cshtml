@@ -1,0 +1,35 @@
+@using CovidOutApp.Web.ViewModels
+@model ImageUploadViewModel
+
+<hr/>
+<div class="row">
+    <div class="col-md-12">
+        <strong>Image Upload</strong>
+    </div>
+    <div class="col-md-12">
+        <form asp-controller="Venue" asp-action="UploadImage" enctype="multipart/form-data">
+                   <div class="form-group" >
+                        @Html.LabelFor(m=>m.Title)
+                        @Html.TextBoxFor(m=>m.Title, null, new {@class ="form-control"})
+                        @* <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span> 
+                    </div>*@
+                <div class="form-group">
+                    <label for="file">File</label>
+                    <input id="file" type="File" name="file" />
+                </div>
+            <div class="form-group">
+                 @Html.LabelFor(m=>m.IsLogoImage)
+                 @Html.CheckBoxFor(m=>m.IsLogoImage, new {@class ="form-control"})
+             </div>
+             <div class="form-group">
+                 @Html.HiddenFor(m=>m.VenueId, new {@class ="form-control"})
+                @* <input asp-for="VenueId" value="@Model.VenueId" class="form-control"  /> *@
+             </div>
+            
+            <button class="btn btn-primary">Upload</button>
+        </form>
+    </div>   
+</div>
+<hr/>
