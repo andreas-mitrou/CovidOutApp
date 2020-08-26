@@ -14,6 +14,9 @@ using CovidOutApp.Web.ServiceLayer;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
+using QRCoder;
+using System.Drawing;
+using System.IO;
 
 namespace CovidOutApp.Web.Controllers
 {
@@ -89,6 +92,91 @@ namespace CovidOutApp.Web.Controllers
             return View(venues);
         }
 
+        [HttpPost]
+        public IActionResult DownloadQRCode(QRCodeViewModel qrCode){
+            var venueId = qrCode.VenueId;  
+            
+            try
+            {              
+                var venue = this._venueService.GetVenueById(venueId);
+                
+                if (venue == null){
+                    throw new Exception("venue was not found");
+                }
+
+                var qrCodeFilePath = venue.QRCodeImageUrl;
+
+                var qrCodeFileName = System.IO.Path.GetFileName(qrCodeFilePath);
+              
+                var fullFilePath = Path.Combine (Globals.QRCODE_DIR, qrCodeFileName);
+
+                var bytes = System.IO.File.ReadAllBytes(fullFilePath);
+
+                string contentType = "application/jpeg";
+
+                return File(bytes,contentType,qrCodeFileName);
+
+            }
+            catch (System.Exception ex)
+            {                
+                this._logger.LogError(ex.StackTrace);
+                TempData["Error"] = ex.Message;
+               
+                return RedirectToAction("QRCode", new { id = venueId});
+            }
+        }
+        [HttpGet]
+        public IActionResult QRCode(string id){
+            
+            var qrCode = new QRCodeViewModel();
+
+            try {
+                 if (id == null)
+                     throw new Exception("The venue cannot be found");
+
+                 var venue = this._venueService.GetVenueById(Guid.Parse(id));
+
+                 if (venue == null) 
+                    throw new Exception("The venue cannot be found");
+
+                qrCode.ImageUrl = venue.QRCodeImageUrl;
+                qrCode.VenueId = venue.Id;
+
+                if (TempData["Error"] != null){
+                    ViewBag.Error = TempData["Error"] as string;
+                }
+                 
+            }
+            catch(Exception ex){
+                this._logger.LogError(ex.StackTrace);  
+                ModelState.AddModelError("Error",ex.Message);
+            }
+
+           return View (qrCode);
+        }
+
+        [HttpPost]
+        public IActionResult QRCode(QRCodeViewModel qrCode){
+
+            if (ModelState.IsValid){
+                 try {
+                    var url =  Url.Action("Details", "Venue", new { id = qrCode.VenueId });
+                    
+                    var qrcode_file = this._venueService.GenerateQRCodeFromUrl(url);
+                    
+                    this._venueService.UpdateVenueQRCode(qrCode.VenueId, qrcode_file);
+
+                    return RedirectToAction("Index");   
+                }
+                catch(Exception ex){
+                    this._logger.LogError(ex.Message);
+                    ModelState.AddModelError("Εrror",ex.Message);
+                }
+            }
+
+            return View(qrCode);
+           
+        }
 
         [HttpPost] 
         public async Task<IActionResult> UploadImage(ImageUploadViewModel image, IFormFile file){
@@ -102,7 +190,7 @@ namespace CovidOutApp.Web.Controllers
                 try {
                      if (file != null) {
 
-                          var imageDb = new Image();
+                          var imageDb = new CovidOutApp.Web.Models.Image();
                           imageDb.Id = Guid.NewGuid();
                           imageDb.Name = image.Title;
                           imageDb.Venue = this._venueService.GetVenueById(image.VenueId);

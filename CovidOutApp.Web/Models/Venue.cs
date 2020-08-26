@@ -14,6 +14,7 @@ namespace CovidOutApp.Web.Models {
         public TimeSpan TimeCloses {get;set;}
         public string Logo {get;set;}
         public string OwnerUserId {get;set;}
+        public string QRCodeImageUrl {get;set;}
         ICollection<Image> Images {get;set;}
     }
 }

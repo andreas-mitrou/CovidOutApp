@@ -40,7 +40,9 @@ namespace CovidOutApp.Web.Controllers
             return View();
         }
 
-
+        [HttpGet]  
+        public IActionResult ScanQRCode() => View();
+        
         [HttpPost]
         public async Task<IActionResult> CheckIn(VenueCheckInViewModel checkIn){
 

@@ -8,6 +8,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
+using QRCoder;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace CovidOutApp.Web.ServiceLayer {
     public class VenueService: IVenueService {
@@ -243,7 +246,7 @@ namespace CovidOutApp.Web.ServiceLayer {
             }
         }
 
-        public IEnumerable<Image> GetVenueImages(Guid venueId)
+        public IEnumerable<CovidOutApp.Web.Models.Image> GetVenueImages(Guid venueId)
         {
             try
             {
@@ -261,6 +264,26 @@ namespace CovidOutApp.Web.ServiceLayer {
             }
         }
 
+
+        public string GenerateQRCodeFromUrl(string url){
+            try
+            {
+                   QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                   QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+                   QRCode qrCode = new QRCode(qrCodeData);
+            
+                    Bitmap qrCodeImage = qrCode.GetGraphic(20);
+                    var filePath = Path.Combine(Globals.QRCODE_DIR, $"{Guid.NewGuid().ToString()}.jpeg");
+                    qrCodeImage.Save(filePath,ImageFormat.Jpeg);
+            
+                    return filePath;       
+            }
+            catch (System.Exception ex)
+            {
+                this._logger.LogError(ex.StackTrace);
+                throw;
+            }
+        }    
         private async Task<string> SaveImageToFile(IFormFile postedFile, string directory){
             if (postedFile.Length > 0) {
                 
@@ -279,8 +302,32 @@ namespace CovidOutApp.Web.ServiceLayer {
             return null;
         }
         
+        public bool UpdateVenueQRCode(Guid venueId, string file){
+            var result = false;
+            try
+            {   
+                var venue = this._venueRepository.Find(venueId);
 
-        public async Task<bool> AddImageAsync(Image imageMetadata, IFormFile imageFile, bool isLogo)
+                if (!String.IsNullOrEmpty(file)){
+
+                     var filename = System.IO.Path.GetFileName(file);
+
+                     venue.QRCodeImageUrl = $"/QRCODES/{filename}";
+
+                    this._venueRepository.Update(venue);
+                
+                    result = true;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                this._logger.LogError(ex.StackTrace);
+                throw;
+            }
+
+            return result;
+        }
+        public async Task<bool> AddImageAsync(CovidOutApp.Web.Models.Image imageMetadata, IFormFile imageFile, bool isLogo)
         {
             var imageStored = false;
 
