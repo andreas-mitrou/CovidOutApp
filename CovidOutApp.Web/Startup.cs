@@ -81,6 +81,14 @@ namespace CovidOutApp.Web
 
             Globals.FILE_UPLOAD_DIR = Path.Combine(env.WebRootPath,"VenueFiles");
 
+            if (!Directory.Exists(Globals.FILE_UPLOAD_DIR))
+                Directory.CreateDirectory(Globals.FILE_UPLOAD_DIR);
+
+            Globals.QRCODE_DIR = Path.Combine(env.WebRootPath,"QRCODES");
+
+             if (!Directory.Exists(Globals.QRCODE_DIR))
+                Directory.CreateDirectory(Globals.QRCODE_DIR);
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

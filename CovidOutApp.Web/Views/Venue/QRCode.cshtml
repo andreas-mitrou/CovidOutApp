@@ -1,0 +1,61 @@
+@model CovidOutApp.Web.ViewModels.QRCodeViewModel
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Images</title>
+</head>
+<body>
+<div class="container">
+    <div id="qr-container" class="row">
+        <div class="col-md-12" style="text-align:center">
+             <a id="qrCodeLnk" href = "@Model.ImageUrl" target="_blank">
+                 <img src="@Model.ImageUrl" width="50%" height="70%"/>
+             </a>
+        </div>
+    </div>
+    <div id="qr-container2" class="row">
+        <div class="col-md-6"  style="text-align:center">
+                <form asp-action = "QRCode" method="POST">
+                    <input type="hidden" asp-for="VenueId"  value="@Model.VenueId" />
+                    <button class="btn btn-primary" id="qr-code-gen">Generate QR Code</button>
+                </form>
+        </div>
+        <div class="col-md-6" style="text-align:center">
+            <form asp-action = "DownloadQRCode" method="POST">
+                <input type="hidden" asp-for="VenueId"  value="@Model.VenueId" />
+                <button class="btn btn-primary" id="qr-code-download">Download</button>
+            </form>
+        </div>
+    </div>
+    <div>
+        <span id="qr-scanned-message"></span>
+    </div>
+    @if (!String.IsNullOrEmpty(ViewBag.Error)){
+         <div id ="error-container" class="row">
+            <div class="col-md-12"  style="text-align:center">
+                <span style="color:red">@ViewBag.Error</span>
+            </div>
+        </div>
+    }
+</div>
+@* 
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            $("#qr-code-download").click(function(e){
+                debugger;
+                e.preventDefault();
+                $("#qrCodeLnk").trigger('click');
+            });
+        });
+    </script>
+} *@
+</body>
+</html>

@@ -26,5 +26,7 @@ namespace CovidOutApp.Web.ServiceLayer {
         Task<bool> AddImageAsync (Image imageMetadata, IFormFile imageFile,  bool isLogo);
         bool DeleteImage (Guid id);
         bool DeleteVenueLogoImage(Guid venueId);
+        string GenerateQRCodeFromUrl(string url);
+        bool UpdateVenueQRCode(Guid venueId, string url);
     }
 }

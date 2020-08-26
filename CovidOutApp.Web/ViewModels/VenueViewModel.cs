@@ -16,5 +16,6 @@ namespace CovidOutApp.Web.ViewModels {
         public IEnumerable<VenueImageViewModel> Images {get;set;}
         public bool? IsApproved {get;set;}
         public string Logo {get;set;}
+        public string QRCode {get;set;}
     }
 }
