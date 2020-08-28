@@ -31,8 +31,9 @@ namespace CovidOutApp.Web.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("/Index");
             }
-
+            
             var user = await _userManager.FindByIdAsync(userId);
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
