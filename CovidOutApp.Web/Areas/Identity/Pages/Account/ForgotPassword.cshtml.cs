@@ -61,6 +61,9 @@ namespace CovidOutApp.Web.Areas.Identity.Pages.Account
                 if (Globals.HostingEnvironment == "DEV")
                     Input.Email = "donmondi@gmail.com";
 
+                _emailSender.From = "donmondi@gmail.com";
+                _emailSender.Port = 587;
+
                 await _emailSender.SendEmailAsync(
                     Input.Email,
                     "Reset Password",
