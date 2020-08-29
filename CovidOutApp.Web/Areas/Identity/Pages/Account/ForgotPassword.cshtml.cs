@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using CovidOutApp.Web.Models;
+using CovidOutApp.Web.Messaging;
 
 namespace CovidOutApp.Web.Areas.Identity.Pages.Account
 {
@@ -18,9 +19,9 @@ namespace CovidOutApp.Web.Areas.Identity.Pages.Account
     public class ForgotPasswordModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly IExtendedEmailSender _emailSender;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IExtendedEmailSender emailSender)
         {
             _userManager = userManager;
             _emailSender = emailSender;
@@ -56,6 +57,9 @@ namespace CovidOutApp.Web.Areas.Identity.Pages.Account
                     pageHandler: null,
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
+
+                if (Globals.HostingEnvironment == "DEV")
+                    Input.Email = "donmondi@gmail.com";
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,

@@ -16,6 +16,7 @@ using CovidOutApp.Web.Models;
 using CovidOutApp.Web.Repositories;
 using CovidOutApp.Web.ServiceLayer;
 using System.IO;
+using CovidOutApp.Web.Messaging;
 
 namespace CovidOutApp.Web
 {
@@ -51,7 +52,8 @@ namespace CovidOutApp.Web
                     ));
             
             
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>
+                (options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders()
@@ -59,9 +61,13 @@ namespace CovidOutApp.Web
                 
             CofigureRepositoriesDI(services);
             CofigureServicesDI(services);
+           
+            services.AddTransient<IExtendedEmailSender, StandardEmailMessager>();
+            services.Configure<SMTP>(Configuration.GetSection("SMTP"));
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,12 +77,14 @@ namespace CovidOutApp.Web
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                Globals.HostingEnvironment  = "DEV";
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                Globals.HostingEnvironment  = "PROD";
             }
 
             Globals.FILE_UPLOAD_DIR = Path.Combine(env.WebRootPath,"VenueFiles");
@@ -85,6 +93,8 @@ namespace CovidOutApp.Web
                 Directory.CreateDirectory(Globals.FILE_UPLOAD_DIR);
 
             Globals.QRCODE_DIR = Path.Combine(env.WebRootPath,"QRCODES");
+
+            Globals.Emails_DIR = Path.Combine(env.WebRootPath,"Emails");
 
              if (!Directory.Exists(Globals.QRCODE_DIR))
                 Directory.CreateDirectory(Globals.QRCODE_DIR);
