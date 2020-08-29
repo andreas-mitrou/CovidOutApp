@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace CovidOutApp.Web.Areas.Identity.Pages.Account
@@ -27,16 +28,20 @@ namespace CovidOutApp.Web.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IExtendedEmailSender _emailSender;
 
+        private readonly IConfiguration _configuration;
+
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IExtendedEmailSender emailSender)
+            IExtendedEmailSender emailSender,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _configuration = configuration;
         }
 
         [BindProperty]
@@ -122,8 +127,10 @@ namespace CovidOutApp.Web.Areas.Identity.Pages.Account
                     // emailProvider.Send(callbackUrl);
 
                     _emailSender.From = "donmondi@gmail.com";
-                    _emailSender.Port = 5087;
-                    Input.Email = _emailSender.From;
+                    _emailSender.Port = 587;
+
+                    if (Globals.HostingEnvironment =="DEV")
+                        Input.Email = _emailSender.From;
                     
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");

@@ -29,6 +29,7 @@ namespace CovidOutApp.Web.Messaging {
         }
 
         private void Execute(string toEmail, string subject, string htmlMessage)  {
+            
             SmtpClient client = new SmtpClient();
 
             client.DeliveryMethod = this.Delivery;
