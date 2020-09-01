@@ -8,6 +8,10 @@ namespace CovidOutApp.Web.ViewModels {
         public DateTime CheckIn { get; set; }
         public DateTime? CheckOut { get; set; }
         public string VisitorComments {get;set;}
-        public string UserId {get;set;}        
+        public string UserId {get;set;} 
+        public string UserName {get;set;}
+        public string UserLastName {get;set;}
+        public DateTime? ExpectedCheckOut {get;set;}
+
     }
 }

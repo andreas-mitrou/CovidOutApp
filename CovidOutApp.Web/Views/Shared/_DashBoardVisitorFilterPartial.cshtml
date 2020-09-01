@@ -1,0 +1,22 @@
+@model CovidOutApp.Web.ViewModels.DashBoardFilter
+<div class="row" style="width:80%;margin:0px auto">
+    <form asp-controller="VisitorManagement" asp-action="Filter" style="width:100%">
+        <div class="row" style="text-align:center">
+             <div class="col-md-6 form-group">
+                <label for="StartDate">From:</label>
+                <input asp-for="StartDate"/>
+            </div>
+            <div class ="col-md-6 form-group">
+                <label for="EndDate">To:</label>
+                <input asp-for="EndDate"/>
+            </div>               
+            <input asp-for="VenueId" type="hidden"/>            
+        </div>
+        <div class="row" style="text-align:center">
+            <div style="width:100%">
+                <button class="btn btn-primary" >Search</button>
+            </div>            
+        </div>
+    </form>
+
+</div>
