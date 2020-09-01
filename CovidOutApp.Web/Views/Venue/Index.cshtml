@@ -39,7 +39,8 @@
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Images" asp-route-id="@item.Id">Images</a> |
                 <a asp-action="QRCode" asp-route-id="@item.Id">QRCode</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> 
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                <a asp-controller="VisitorManagement" asp-action="Index" asp-route-id="@item.Id">Live DashBoard</a>
                 @if (item.IsApproved == null) {
                     <span>|</span>
                     @Html.ActionLink("Register","Create","VenueRegistrationApplication",new {venueId = item.Id})   

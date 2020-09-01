@@ -15,7 +15,9 @@ namespace CovidOutApp.Web.Repositories {
 
         public IEnumerable<Visit> QueryIncludeRelatedData(Expression<Func<Visit, bool>> predicate)
         {
-            return this.dbSet.Include(c=>c.Venue).Where(predicate);
+            return this.dbSet.Include(c=>c.Venue)
+                             .Include(c=>c.User).
+                              Where(predicate);
         }
     }
 }

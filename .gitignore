@@ -2,3 +2,6 @@ bin
 obj
 app.db-shm
 app.db-wal
+Emails
+QRCODES
+VenueFiles
