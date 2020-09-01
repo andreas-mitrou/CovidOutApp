@@ -15,7 +15,8 @@ namespace CovidOutApp.Web.Data
         public DbSet<Venue> Venues {get;set;}
         public DbSet<Visit> Visits {get;set;}
         public DbSet<Image> Images {get;set;}
-
         public DbSet<VenueRegistrationApplication> VenueRegistrationApplications { get; set; }
+        public DbSet<VenueRules> VenueRules {get;set;}
     }
 }
+   

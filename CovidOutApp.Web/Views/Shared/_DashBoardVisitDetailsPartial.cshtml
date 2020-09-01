@@ -1,0 +1,38 @@
+@model CovidOutApp.Web.ViewModels.VenueVisitViewModel;
+
+<div class="row">
+             <div id="dashboard-visitors-container">
+                 <div style="padding:1%">
+                     <strong>Customer</strong>:@Model.UserName @Model.UserLastName
+                 </div>
+                  <div style="padding:1%">
+                     <strong>Check In Date:</strong> @Model.CheckIn.Year- @Model.CheckIn.Month- @Model.CheckIn.Day
+                 </div>
+                 <div style="padding:1%">
+                     <div class="row">
+                         <div class="col-md-4">
+                              <strong>Check In Time:</strong> @Model.CheckIn.Hour:@Model.CheckIn.Minute
+                         </div>
+                         <div class="col-md-4">
+                              <strong>Check Out Time:</strong>
+                                @if( @Model.CheckOut != null && @Model.CheckOut != DateTime.MinValue){
+                                    <span>@Model.CheckOut.Value.Hour : @Model.CheckOut.Value.Minute</span>;
+                                } 
+                                else {
+                                    <span>Customer is still in</span>
+                                }
+                         </div>
+                         <div class="col-md-4">
+                              <strong>Estimated Time for Check Out:</strong>
+                                @if( @Model.ExpectedCheckOut != null){
+                                    <span>@Model.ExpectedCheckOut.Value.Hour : @Model.ExpectedCheckOut.Value.Minute</span>;
+                                } 
+                                else {
+                                    <span>N/A</span>
+                                }
+                         </div>
+
+                     </div>                    
+                </div>               
+             </div>
+         </div>

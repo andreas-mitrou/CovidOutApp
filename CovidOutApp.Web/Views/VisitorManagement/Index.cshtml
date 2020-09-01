@@ -1,0 +1,51 @@
+@model CovidOutApp.Web.ViewModels.VisitorManagementViewModel
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    <div id="capacity-indicator" class="row">
+        <div class="col-md-12" style="text-align:center">
+            <div>
+                @{
+                    var ratio = Model.CurrentCapacityStatus.PeopleDensity;
+                    var color = "";
+                }
+                @if (ratio <= 0.66){
+                    color ="green";
+                }
+                else if (ratio > 0.66 && ratio <= 0.8){
+                    color ="orange";
+                }
+                else {
+                    color ="red"; 
+                }
+                <div style="padding:2%">
+                    <strong>Max Capacity:@Model.CurrentCapacityStatus.MaxCapacity</strong>
+                </div>
+                 <div style="padding:2%">
+                    <strong>Visitors Checked In:@Model.CurrentCapacityStatus.CurrentVisitorsCount</strong>
+                </div>
+                <div style="padding:2%">
+                    <span>
+                        <strong style="color:@color">People Ration Status</strong>:@Model.CurrentCapacityStatus.PeopleDensity
+                    </span>
+                </div >                
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <div id = "current-time-customers" class="row">
+        <div class="col-md-12">
+            @Html.Partial("_DashBoardVisitorFilterPartial", @Model.Filter)
+        </div>
+        <hr/>
+        <div class="col-md-12">
+            @foreach (var customer in Model.Visitors)
+        {
+            @Html.Partial("_DashBoardVisitDetailsPartial", customer);
+        }
+        </div>
+        
+    </div>
+</div>
