@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using CovidOutApp.Web.Models;
 using CovidOutApp.Web.Repositories;
 
@@ -8,7 +9,6 @@ namespace CovidOutApp.Web.ServiceLayer
 {
     public class VenueRulesService : IVenueRulesService
     {
-        
         private readonly IVenueRulesRepository _rulesRepository;
 
         public VenueRulesService (IVenueRulesRepository rulesRepository){
@@ -89,6 +89,30 @@ namespace CovidOutApp.Web.ServiceLayer
                 
                 throw;
             }
+        }
+
+        
+        public VenueRules GetRuleByRuleId(Guid ruleId)
+        {
+            try
+            {
+                if (ruleId == Guid.Empty)
+                    throw new Exception("rule id cannot be empty");
+
+                var rule = this._rulesRepository.Find(ruleId);
+                return rule;
+            }
+            catch (System.Exception ex)
+            {                
+                throw;
+            }
+           
+        }
+
+        public IEnumerable<VenueRules> GetRuleQueryFetchAdditionalData(Expression<Func<VenueRules, bool>> rulesQuery)
+        {             
+            var results = this._rulesRepository.GetRuleQueryFetchAdditionalData(rulesQuery);
+            return results;
         }
     }
 }

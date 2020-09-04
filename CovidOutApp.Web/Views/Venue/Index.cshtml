@@ -40,6 +40,7 @@
                 <a asp-action="Images" asp-route-id="@item.Id">Images</a> |
                 <a asp-action="QRCode" asp-route-id="@item.Id">QRCode</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                <a asp-controller="VenueRules" asp-action="Index" asp-route-venueId="@item.Id">VenueRules</a> |
                 <a asp-controller="VisitorManagement" asp-action="Index" asp-route-id="@item.Id">Live DashBoard</a>
                 @if (item.IsApproved == null) {
                     <span>|</span>

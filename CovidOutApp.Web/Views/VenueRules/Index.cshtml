@@ -1,0 +1,60 @@
+@model IEnumerable<CovidOutApp.Web.ViewModels.VenueRulesViewModel>
+
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    var id = ViewContext.RouteData.Values["venueId"] ?? Context.Request.Query["venueId"] ;
+}
+
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create" asp-route-venueId="@id">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ValidFrom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ValidTo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AllowedCapacity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VenueId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ValidFrom)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ValidTo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AllowedCapacity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VenueId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
